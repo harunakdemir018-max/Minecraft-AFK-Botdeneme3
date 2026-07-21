@@ -1,37 +1,45 @@
+const http = require('http');
+
+// Render'ın "No open ports" uyarısını engellemek için mini web sunucusu
+http.createServer((req, res) => {
+  res.write("AFK Botu 7/24 Aktif!");
+  res.end();
+}).listen(process.env.PORT || 3000);
+
 const mineflayer = require('mineflayer');
 
 const botOptions = {
   host: 'oyna.wrus.net', // Örn: sunucun.aternos.me
-  port: 25565,               // Sunucu portu
-  username: 'txcpsy724',    // Botun oyundaki adı
-  version: false             // Sürüm otomatik algılanır
+  port: 25565,               // Portun varsa değiştir, yoksa 25565 kalsın
+  username: 'txcpsyc724',    // Botun adı
+  version: '1.20.1'          // Java/Geyser uyumluluğu için sürüm belirtildi
 };
 
 function createBot() {
   const bot = mineflayer.createBot(botOptions);
 
   bot.on('spawn', () => {
-    console.log('Bot sunucuya bağlandı!');
+    console.log('Bot sunucuya başarıyla bağlandı!');
 
-    // 1. ADIM: 3 saniye sonra İlk Şifre
+    // 1. ADIM: 3. saniyede ilk şifre
     setTimeout(() => {
       bot.chat('1122334455harun'); 
     }, 3000);
 
-    // 2. ADIM: 6 saniye sonra İkinci kez Şifre (Onay için)
+    // 2. ADIM: 6. saniyede ikinci şifre
     setTimeout(() => {
       bot.chat('1122334455harun'); 
     }, 6000);
 
-    // 3. ADIM: 9 saniye sonra Gmail adresini yazma
+    // 3. ADIM: 9. saniyede Gmail adresi
     setTimeout(() => {
       bot.chat('harun123455789pp@gmail.com'); 
     }, 9000);
 
-    // 4. ADIM: 12 saniye sonra 5. slotdaki pusulayı eline alıp sağ tık yapma
+    // 4. ADIM: 12. saniyede 5. slottaki pusulayı kullanma
     setTimeout(async () => {
       try {
-        const slotIndex = 4; // 5. slot (0'dan başlar)
+        const slotIndex = 4; // 5. slot
         const item = bot.inventory.slots[slotIndex];
         
         if (item) {
@@ -39,38 +47,38 @@ function createBot() {
           bot.activateItem();
           console.log('5. slottaki pusula kullanıldı, menü açılıyor...');
         } else {
-          console.log('5. slot boş!');
+          console.log('5. slotta pusula bulunamadı!');
         }
       } catch (err) {
-        console.log('Pusula kullanılırken hata oluştu:', err);
+        console.log('Pusula kullanılırken hata:', err);
       }
     }, 12000);
 
-    // 5. ADIM: 15 saniye sonra açılan menüden 21. slotdaki Survival seçeneğine tıklama
+    // 5. ADIM: 15. saniyede menüden 21. slota tıklama (Survival)
     setTimeout(() => {
       try {
-        const survivalSlot = 20; // 21. slot (0'dan başlar)
+        const survivalSlot = 20; // 21. slot
         
         if (bot.currentWindow) {
           bot.clickWindow(survivalSlot, 0, 0);
-          console.log('21. slottaki Survival seçeneğine tıklandı!');
+          console.log('Survival seçeneğine tıklandı!');
         } else {
-          console.log('Menü açık değil, tıklanamadı!');
+          console.log('Menü açık değil!');
         }
       } catch (err) {
-        console.log('Menüye tıklanırken hata oluştu:', err);
+        console.log('Menüye tıklanırken hata:', err);
       }
     }, 15000);
 
-    // 6. ADIM: 19 saniye sonra Survival'a geçtikten sonra AFK bölgesine gitme
+    // 6. ADIM: 19. saniyede AFK alanına ışınlanma
     setTimeout(() => {
       bot.chat('/warp afk');
-      console.log('/warp afk komutu gönderildi!');
+      console.log('/warp afk gönderildi!');
     }, 19000);
 
   });
 
-  // Botun oyundan atılmaması için her 60 saniyede bir zıplaması
+  // Düşmemek için dakikada bir zıplama
   bot.on('spawn', () => {
     setInterval(() => {
       bot.setControlState('jump', true);
@@ -80,13 +88,17 @@ function createBot() {
     }, 60000);
   });
 
-  // Bağlantı koparsa yeniden bağlanma
+  // Koparsa tekrar bağlanma
   bot.on('end', () => {
-    console.log('Bağlantı koptu, yeniden bağlanılıyor...');
+    console.log('Bağlantı koptu, 10sn sonra tekrar deneniyor...');
     setTimeout(createBot, 10000);
   });
 
   bot.on('error', err => console.log('Hata:', err));
+}
+
+createBot();
+
 }
 
 createBot();
