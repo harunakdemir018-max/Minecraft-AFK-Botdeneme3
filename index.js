@@ -1,7 +1,7 @@
 const http = require('http');
 const mineflayer = require('mineflayer');
 
-// Render'ın kapanmasını önleyen mini sunucu
+// Render'ın kapanmasını önleyen mini web sunucusu
 http.createServer((req, res) => {
   res.write("AFK Botu 7/24 Aktif!");
   res.end();
@@ -11,14 +11,15 @@ const botOptions = {
   host: 'oyna.wrus.net',
   port: 25565,
   username: 'TxcPsych11',
-  version: '1.20.1'
+  version: false // Sürümü sunucudan otomatik algılasın!
 };
 
 function createBot() {
+  console.log('Sunucuya bağlanılmaya çalışılıyor...');
   const bot = mineflayer.createBot(botOptions);
 
   bot.on('spawn', () => {
-    console.log('Bot sunucuya başarıyla bağlandı!');
+    console.log('Bot sunucuya başarıyla girdi!');
 
     // 1. ADIM: 3. saniyede ilk şifre
     setTimeout(() => {
@@ -41,7 +42,7 @@ function createBot() {
     // 4. ADIM: 12. saniyede 5. slottaki pusulayı kullanma
     setTimeout(async () => {
       try {
-        const item = bot.inventory.slots[4]; // 5. slot (Index 4)
+        const item = bot.inventory.slots[4];
         if (item) {
           await bot.equip(item, 'hand');
           bot.activateItem();
@@ -50,21 +51,21 @@ function createBot() {
           console.log('5. slotta pusula bulunamadı.');
         }
       } catch (err) {
-        console.log('Pusula kullanılırken hata:', err);
+        console.log('Pusula hatası:', err.message);
       }
     }, 12000);
 
-    // 5. ADIM: 15. saniyede menüden 21. slota tıklama (Survival)
+    // 5. ADIM: 15. saniyede Survival seçme
     setTimeout(() => {
       try {
         if (bot.currentWindow) {
-          bot.clickWindow(20, 0, 0); // 21. slot (Index 20)
+          bot.clickWindow(20, 0, 0);
           console.log('21. slottaki Survival seçildi!');
         } else {
-          console.log('Menü açık olmadığı için tıklanamadı.');
+          console.log('Menü açık değil.');
         }
       } catch (err) {
-        console.log('Menü tıklama hatası:', err);
+        console.log('Menü hatası:', err.message);
       }
     }, 15000);
 
@@ -73,10 +74,9 @@ function createBot() {
       bot.chat('/warp afk');
       console.log('/warp afk gönderildi!');
     }, 19000);
-
   });
 
-  // Oyundan atılmamak için 60 saniyede bir zıplama
+  // Zıplama
   bot.on('spawn', () => {
     setInterval(() => {
       bot.setControlState('jump', true);
@@ -84,13 +84,13 @@ function createBot() {
     }, 60000);
   });
 
-  // Bağlantı koparsa otomatik tekrar bağlanma
-  bot.on('end', () => {
-    console.log('Bağlantı koptu, 10 saniye sonra tekrar bağlanılıyor...');
+  // Hata detayını görme
+  bot.on('error', err => console.log('Bağlantı Hatası Detayı:', err.message || err));
+
+  bot.on('end', reason => {
+    console.log('Bağlantı koptu (Sebep: ' + reason + '), 10s sonra tekrar deneniyor...');
     setTimeout(createBot, 10000);
   });
-
-  bot.on('error', err => console.log('Hata:', err));
 }
 
 createBot();
